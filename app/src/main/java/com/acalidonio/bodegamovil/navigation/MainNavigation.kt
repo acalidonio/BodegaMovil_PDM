@@ -11,7 +11,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
-import com.acalidonio.bodegamovil.screen.dashboard.DashboardScreen
+import com.acalidonio.bodegamovil.screen.detail.ProductDetailScreen
+import com.acalidonio.bodegamovil.screen.home.HomeScreen
 import com.acalidonio.bodegamovil.screen.login.LoginScreen
 
 @Composable
@@ -25,12 +26,20 @@ fun BodegaMovilApp() {
             entry<Routes.Login> {
                 LoginScreen(
                     onLoginSuccess = {
-                        backStack = listOf(Routes.Dashboard) // Ir al dashboard (login propio no implementado)
+                        backStack = listOf(Routes.Home)
                     }
                 )
             }
-            entry<Routes.Dashboard> {
-                DashboardScreen()
+            entry<Routes.Home> {
+                HomeScreen(
+                    onNavigateToProductDetail = { sku -> backStack = backStack + Routes.ProductDetail(sku) }
+                )
+            }
+            entry<Routes.ProductDetail> { route ->
+                ProductDetailScreen(
+                    sku = route.sku,
+                    onBackClick = { backStack = backStack.dropLast(1) }
+                )
             }
         },
         transitionSpec = {
