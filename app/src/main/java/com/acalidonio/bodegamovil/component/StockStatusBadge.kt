@@ -17,9 +17,9 @@ import com.acalidonio.bodegamovil.model.StockStatus
 @Composable
 fun StockStatusBadge(status: StockStatus) {
     val (backgroundColor, textColor, text) = when (status) {
-        StockStatus.AVAILABLE -> Triple(Color(0xFFE8F5E9), Color(0xFF2E7D32), "Disponible")
-        StockStatus.LOW_STOCK -> Triple(Color(0xFFFFF8E1), Color(0xFFF57F17), "Poco Stock")
-        StockStatus.OUT_OF_STOCK -> Triple(Color(0xFFFFEBEE), Color(0xFFC62828), "Agotado")
+        StockStatus.AVAILABLE -> Triple(Color(0xFFE8F5E9), Color(0xFF226626), "Disponible")
+        StockStatus.LOW_STOCK -> Triple(Color(0xFFFFF8E1), Color(0xFFBB6E06), "Poco Stock")
+        StockStatus.OUT_OF_STOCK -> Triple(Color(0xFFFFEBEE), Color(0xFFA81111), "Agotado")
     }
 
     Box(
@@ -32,7 +32,7 @@ fun StockStatusBadge(status: StockStatus) {
             text = text,
             color = textColor,
             fontSize = 12.sp,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.SemiBold
         )
     }
 }
