@@ -3,8 +3,11 @@ package com.acalidonio.bodegamovil.repository.impl
 import com.acalidonio.bodegamovil.dummy.DummyWarehouseData
 import com.acalidonio.bodegamovil.model.Product
 import com.acalidonio.bodegamovil.repository.InventoryRepository
+import com.acalidonio.bodegamovil.data.remote.ApiService
 
-class InventoryRepositoryImpl : InventoryRepository {
+class InventoryRepositoryImpl(
+    private val apiService: ApiService? = null
+) : InventoryRepository {
     override suspend fun getProducts(): List<Product> {
         return DummyWarehouseData.sampleProducts
     }

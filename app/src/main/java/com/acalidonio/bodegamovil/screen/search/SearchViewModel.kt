@@ -4,12 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.acalidonio.bodegamovil.model.Product
 import com.acalidonio.bodegamovil.repository.InventoryRepository
-import com.acalidonio.bodegamovil.repository.impl.InventoryRepositoryImpl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.acalidonio.bodegamovil.di.AppContainer
 
 data class SearchUiState(
     val query: String = "",
@@ -18,7 +18,7 @@ data class SearchUiState(
 )
 
 class SearchViewModel(
-    private val repository: InventoryRepository = InventoryRepositoryImpl()
+    private val repository: InventoryRepository = AppContainer.inventoryRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchUiState())

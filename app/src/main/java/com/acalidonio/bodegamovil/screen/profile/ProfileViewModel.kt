@@ -5,12 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.acalidonio.bodegamovil.model.User
 import com.acalidonio.bodegamovil.model.WorkShift
 import com.acalidonio.bodegamovil.repository.UserRepository
-import com.acalidonio.bodegamovil.repository.impl.UserRepositoryImpl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.acalidonio.bodegamovil.di.AppContainer
 
 data class ProfileUiState(
     val user: User? = null,
@@ -20,7 +20,7 @@ data class ProfileUiState(
 )
 
 class ProfileViewModel(
-    private val repository: UserRepository = UserRepositoryImpl()
+    private val repository: UserRepository = AppContainer.userRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
