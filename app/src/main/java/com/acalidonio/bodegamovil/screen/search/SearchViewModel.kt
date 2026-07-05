@@ -36,12 +36,13 @@ class SearchViewModel(
     private fun searchProducts(query: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            val products = repository.searchProducts(query)
-            _uiState.update { 
-                it.copy(
-                    results = products,
-                    isLoading = false
-                ) 
+            repository.searchProducts(query).collect { products ->
+                _uiState.update { 
+                    it.copy(
+                        results = products,
+                        isLoading = false
+                    ) 
+                }
             }
         }
     }
