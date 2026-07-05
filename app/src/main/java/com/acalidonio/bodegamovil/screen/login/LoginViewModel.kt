@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import com.acalidonio.bodegamovil.data.remote.ApiClient
+import com.acalidonio.bodegamovil.repository.TokenRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.map
@@ -22,7 +23,7 @@ data class LoginUiState(
 
 class LoginViewModel(
     private val userRepository: UserRepository = AppContainer.userRepository,
-    private val tokenRepository: com.acalidonio.bodegamovil.repository.TokenRepository = AppContainer.tokenRepository
+    private val tokenRepository: TokenRepository = AppContainer.tokenRepository
 ) : ViewModel() {
     val isLoggedIn: StateFlow<Boolean?> = tokenRepository.getToken()
         .map { token -> 

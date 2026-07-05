@@ -1,16 +1,23 @@
 package com.acalidonio.bodegamovil.screen.home
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -18,42 +25,99 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.acalidonio.bodegamovil.di.AppContainer
 import com.acalidonio.bodegamovil.screen.dashboard.DashboardScreen
 import com.acalidonio.bodegamovil.screen.profile.ProfileScreen
 import com.acalidonio.bodegamovil.screen.search.SearchScreen
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onNavigateToProductDetail: (String) -> Unit
+    onNavigateToProductDetail: (String) -> Unit,
+    onNavigateToCreateProduct: () -> Unit,
+    onLogout: () -> Unit
 ) {
-    var selectedTab by remember { mutableIntStateOf(0) } // 0: Dashboard, 1: Search, 2: Profile
-    var globalSearchQuery by remember { mutableStateOf("") }
+    var selectedTab by rememberSaveable { mutableIntStateOf(0) } // 0: Dashboard, 1: Search, 2: Profile
+    var globalSearchQuery by rememberSaveable { mutableStateOf("") }
+    
+    val userDetails by AppContainer.tokenRepository.getUserDetails().collectAsStateWithLifecycle(initialValue = null)
+    val isAdmin = userDetails?.role == "ADMIN"
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
+        topBar = {
+            if (selectedTab == 0 || selectedTab == 1) {
+                TopAppBar(
+                    title = {
+                        OutlinedTextField(
+                            value = globalSearchQuery,
+                            onValueChange = { 
+                                globalSearchQuery = it
+                                if (it.isNotEmpty() && selectedTab == 0) {
+                                    selectedTab = 1
+                                }
+                            },
+                            placeholder = { Text("Buscar productos, SKU...") },
+                            leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Buscar") },
+                            modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                                focusedBorderColor = Color.DarkGray,
+                                unfocusedBorderColor = Color.DarkGray
+                            )
+                        )
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background
+                    )
+                )
+            }
+        },
         floatingActionButtonPosition = FabPosition.End,
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { /* TODO: scanner */ },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                shape = CircleShape
-            ) {
-                Icon(
-                    imageVector = Icons.Default.QrCodeScanner,
-                    contentDescription = "Escanear QR"
-                )
+            Column {
+                if (isAdmin) {
+                    FloatingActionButton(
+                        onClick = onNavigateToCreateProduct,
+                        containerColor = MaterialTheme.colorScheme.tertiary,
+                        contentColor = MaterialTheme.colorScheme.onTertiary,
+                        shape = CircleShape
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = "Nuevo Producto")
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+                
+                FloatingActionButton(
+                    onClick = { /* TODO: scanner */ },
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    shape = CircleShape
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.QrCodeScanner,
+                        contentDescription = "Escanear QR"
+                    )
+                }
             }
         },
         bottomBar = {
@@ -115,19 +179,12 @@ fun HomeScreen(
             modifier = Modifier.fillMaxSize().padding(innerPadding)
         ) { tab ->
             when (tab) {
-                0 -> DashboardScreen(
-                    searchQuery = globalSearchQuery,
-                    onSearchQueryChange = {
-                        globalSearchQuery = it
-                        if (it.isNotEmpty()) selectedTab = 1
-                    }
-                )
+                0 -> DashboardScreen()
                 1 -> SearchScreen(
                     initialQuery = globalSearchQuery,
-                    onQueryChange = { globalSearchQuery = it },
                     onProductClick = onNavigateToProductDetail
                 )
-                2 -> ProfileScreen()
+                2 -> ProfileScreen(onLogout = onLogout)
             }
         }
     }
