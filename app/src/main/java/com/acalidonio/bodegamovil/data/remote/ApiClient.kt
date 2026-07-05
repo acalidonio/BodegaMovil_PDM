@@ -1,26 +1,29 @@
 package com.acalidonio.bodegamovil.data.remote
 
-import com.acalidonio.bodegamovil.di.AppContainer
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
-import io.ktor.client.plugins.auth.Auth
-import io.ktor.client.plugins.auth.providers.BearerTokens
-import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.serialization.kotlinx.json.json
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.serialization.json.Json
-
-
 import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.request.header
+import io.ktor.http.HttpHeaders
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.json.Json
 
 object ApiClient {
 
-    private const val BASE_URL = "http://192.168.0.11:8080"
+    // Phone testing
+    // private const val BASE_URL = "http://192.168.0.11:8080"
+    // Emulator testing
+    private const val BASE_URL = "http://10.0.2.2:8080/"
+    // Production
+    // private const val BASE_URL = ""
+
+    var authToken: String? = null
 
     val client = HttpClient(OkHttp) {
         defaultRequest {
             url(BASE_URL)
+            authToken?.let { header(HttpHeaders.Authorization, "Bearer $it") }
         }
 
         install(ContentNegotiation) {
@@ -29,15 +32,6 @@ object ApiClient {
                     ignoreUnknownKeys = true
                 }
             )
-        }
-        
-        install(Auth) {
-            bearer {
-                loadTokens {
-                    val token = AppContainer.tokenRepository.getToken().firstOrNull()
-                    if (token != null) BearerTokens(token, "") else null
-                }
-            }
         }
     }
 }

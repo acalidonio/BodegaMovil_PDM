@@ -35,6 +35,11 @@ object InventoryRemoteDataSource {
         return response.data ?: throw Exception(response.message)
     }
 
+    suspend fun getProduct(sku: String): ProductDto? {
+        val response: GeneralResponse<ProductDto> = ApiClient.client.get("$BASE_URL/$sku").body()
+        return response.data
+    }
+
     suspend fun updateProduct(sku: String, product: ProductDto): ProductDto {
         val response: GeneralResponse<ProductDto> = ApiClient.client.put("$BASE_URL/$sku") {
             contentType(ContentType.Application.Json)
