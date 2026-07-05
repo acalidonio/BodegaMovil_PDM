@@ -12,11 +12,17 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.serialization.json.Json
 
 
+import io.ktor.client.plugins.defaultRequest
+
 object ApiClient {
 
-    private const val BASE_URL = "http://10.0.2.2:8080"
+    private const val BASE_URL = "http://192.168.0.11:8080"
 
     val client = HttpClient(OkHttp) {
+        defaultRequest {
+            url(BASE_URL)
+        }
+
         install(ContentNegotiation) {
             json(
                 Json {
