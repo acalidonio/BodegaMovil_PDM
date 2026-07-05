@@ -47,4 +47,8 @@ class ProfileViewModel(
             }
         }
     }
+
+    fun refresh() {
+        loadProfileData()
+    }
 }
