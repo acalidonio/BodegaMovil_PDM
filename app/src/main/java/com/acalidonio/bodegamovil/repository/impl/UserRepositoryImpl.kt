@@ -8,6 +8,8 @@ import com.acalidonio.bodegamovil.repository.TokenRepository
 import com.acalidonio.bodegamovil.repository.UserRepository
 
 import kotlinx.coroutines.flow.firstOrNull
+import com.acalidonio.bodegamovil.data.remote.ShiftRemoteDataSource
+import java.time.LocalDate
 
 class UserRepositoryImpl(
     private val tokenRepository: TokenRepository
@@ -35,8 +37,20 @@ class UserRepositoryImpl(
     }
 
     override suspend fun getWeeklyShifts(): List<WorkShift> {
-        // Since backend doesn't have shifts yet, we will return empty list or keep it dummy.
-        // For offline-first realism without backend support, an empty list is appropriate.
-        return emptyList()
+        return try {
+            val dtos = ShiftRemoteDataSource.getMyWeeklyShifts(0)
+            val today = LocalDate.now().toString()
+            dtos.map { dto ->
+                WorkShift(
+                    date = dto.date,
+                    timeRange = "${dto.startTime.take(5)} - ${dto.endTime.take(5)}",
+                    hoursLogged = dto.hoursLogged,
+                    isActive = dto.date == today
+                )
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
     }
 }

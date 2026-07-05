@@ -34,7 +34,14 @@ class InventoryRepositoryImpl(
     }
 
     override fun getProductBySku(sku: String): Flow<Product?> {
-        refreshProductsFromServer()
+        repositoryScope.launch {
+            try {
+                val remoteProduct = InventoryRemoteDataSource.getProduct(sku)
+                if (remoteProduct != null) {
+                    productDao.insertProduct(remoteProduct.toEntity())
+                }
+            } catch (_: Exception) {}
+        }
         return productDao.getProductBySku(sku).map { it?.toDomain() }
     }
 
@@ -43,6 +50,11 @@ class InventoryRepositoryImpl(
             try {
                 val remoteProducts = InventoryRemoteDataSource.fetchProducts(query)
                 val entities = remoteProducts.map { it.toEntity() }
+                
+                if (query.isNullOrBlank()) {
+                    productDao.deleteAll()
+                }
+                
                 productDao.insertProducts(entities)
             } catch (_: Exception) {}
         }
