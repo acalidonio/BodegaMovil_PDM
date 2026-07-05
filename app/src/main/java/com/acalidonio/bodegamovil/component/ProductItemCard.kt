@@ -87,7 +87,7 @@ fun ProductItemCard(product: Product, onClick: () -> Unit) {
                 }
 
                 Text(
-                    text = "Stock: ${product.stock} unids",
+                    text = "Stock: ${product.stock} un",
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.primary
