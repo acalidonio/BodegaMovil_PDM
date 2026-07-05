@@ -23,4 +23,7 @@ interface ProductDao {
 
     @Query("DELETE FROM products WHERE sku = :sku")
     suspend fun deleteProductBySku(sku: String)
+
+    @Query("DELETE FROM products")
+    suspend fun deleteAll()
 }
