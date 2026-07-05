@@ -12,5 +12,6 @@ data class LoginRequestDto(
 data class AuthResponseDto(
     val token: String,
     val employeeName: String,
+    val initials: String,
     val role: String
 )
