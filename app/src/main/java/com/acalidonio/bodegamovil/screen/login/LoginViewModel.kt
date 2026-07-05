@@ -9,6 +9,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.acalidonio.bodegamovil.data.remote.ApiClient
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.map
 
 data class LoginUiState(
     val isLoading: Boolean = false,
@@ -17,8 +21,19 @@ data class LoginUiState(
 )
 
 class LoginViewModel(
-    private val userRepository: UserRepository = AppContainer.userRepository
+    private val userRepository: UserRepository = AppContainer.userRepository,
+    private val tokenRepository: com.acalidonio.bodegamovil.repository.TokenRepository = AppContainer.tokenRepository
 ) : ViewModel() {
+    val isLoggedIn: StateFlow<Boolean?> = tokenRepository.getToken()
+        .map { token -> 
+            if (token != null) {
+                ApiClient.authToken = token
+                true
+            } else {
+                false
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
@@ -32,6 +47,14 @@ class LoginViewModel(
             } else {
                 _uiState.update { it.copy(isLoading = false, error = "Credenciales incorrectas o error de red") }
             }
+        }
+    }
+    
+    fun logout() {
+        viewModelScope.launch {
+            tokenRepository.clearToken()
+            ApiClient.authToken = null
+            resetState()
         }
     }
     
