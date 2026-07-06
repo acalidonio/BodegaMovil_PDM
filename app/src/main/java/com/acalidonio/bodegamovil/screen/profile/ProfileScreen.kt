@@ -1,5 +1,6 @@
 package com.acalidonio.bodegamovil.screen.profile
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,20 +18,30 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,9 +59,32 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var showDatePicker by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.refresh()
+    }
+
+    if (showDatePicker) {
+        val datePickerState = rememberDatePickerState()
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDatePicker = false
+                    viewModel.jumpToDate(datePickerState.selectedDateMillis)
+                }) {
+                    Text("Aceptar")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text("Cancelar")
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
     }
 
     Box(
@@ -128,33 +162,64 @@ fun ProfileScreen(
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Outlined.Schedule, contentDescription = "Reloj", tint = MaterialTheme.colorScheme.onSurface)
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "Registro Laboral Semanal",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Outlined.Schedule, contentDescription = "Reloj", tint = MaterialTheme.colorScheme.onSurface)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "Registro Laboral",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                            
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                IconButton(onClick = { viewModel.previousWeek() }, modifier = Modifier.size(32.dp)) {
+                                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Semana Anterior")
+                                }
+                                TextButton(onClick = { showDatePicker = true }, modifier = Modifier.padding(horizontal = 4.dp), border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary)) {
+                                    Text(uiState.weekLabelText, fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
+                                }
+                                IconButton(onClick = { viewModel.nextWeek() }, modifier = Modifier.size(32.dp)) {
+                                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "Semana Siguiente")
+                                }
+                            }
                         }
 
                         Spacer(modifier = Modifier.height(24.dp))
 
-                        LazyColumn(
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            items(uiState.weeklyShifts) { shift ->
-                                ShiftItemRow(shift)
-                                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
+                        Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                items(uiState.weeklyShifts) { shift ->
+                                    ShiftItemRow(shift)
+                                    HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
+                                }
+                                item {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Text("Total Esta Semana", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                                        Text("${uiState.totalHours} hrs", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MaterialTheme.colorScheme.primary)
+                                    }
+                                }
                             }
-                            item {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween
+                            
+                            if (uiState.isShiftsLoading) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.6f)),
+                                    contentAlignment = Alignment.Center
                                 ) {
-                                    Text("Total Esta Semana", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
-                                    Text("${uiState.totalHours} hrs", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MaterialTheme.colorScheme.primary)
+                                    CircularProgressIndicator()
                                 }
                             }
                         }

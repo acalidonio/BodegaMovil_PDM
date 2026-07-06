@@ -6,5 +6,5 @@ import com.acalidonio.bodegamovil.model.WorkShift
 interface UserRepository {
     suspend fun login(employeeId: String, password: String): Boolean
     suspend fun getUserProfile(): User
-    suspend fun getWeeklyShifts(): List<WorkShift>
+    suspend fun getWeeklyShifts(weekOffset: Int = 0): List<WorkShift>
 }

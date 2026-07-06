@@ -35,9 +35,9 @@ class UserRepositoryImpl(
         )
     }
 
-    override suspend fun getWeeklyShifts(): List<WorkShift> {
+    override suspend fun getWeeklyShifts(weekOffset: Int): List<WorkShift> {
         return try {
-            val dtos = ShiftRemoteDataSource.getMyWeeklyShifts(0)
+            val dtos = ShiftRemoteDataSource.getMyWeeklyShifts(weekOffset)
             val today = LocalDate.now().toString()
             dtos.map { dto ->
                 WorkShift(
