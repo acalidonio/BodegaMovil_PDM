@@ -1,6 +1,8 @@
 package com.acalidonio.bodegamovil.screen.home
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,11 +19,13 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.Alignment
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -41,6 +45,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
+import android.widget.Toast
+import androidx.compose.runtime.remember
+import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import com.acalidonio.bodegamovil.di.AppContainer
 import com.acalidonio.bodegamovil.screen.dashboard.DashboardScreen
 import com.acalidonio.bodegamovil.screen.profile.ProfileScreen
@@ -51,13 +63,39 @@ import com.acalidonio.bodegamovil.screen.search.SearchScreen
 fun HomeScreen(
     onNavigateToProductDetail: (String) -> Unit,
     onNavigateToCreateProduct: () -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    viewModel: HomeViewModel = viewModel()
 ) {
     var selectedTab by rememberSaveable { mutableIntStateOf(0) } // 0: Dashboard, 1: Search, 2: Profile
     var globalSearchQuery by rememberSaveable { mutableStateOf("") }
     
     val userDetails by AppContainer.tokenRepository.getUserDetails().collectAsStateWithLifecycle(initialValue = null)
     val isAdmin = userDetails?.role == "ADMIN"
+    
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    
+    val scannerOptions = remember {
+        GmsBarcodeScannerOptions.Builder()
+            .setBarcodeFormats(Barcode.FORMAT_ALL_FORMATS)
+            .enableAutoZoom()
+            .build()
+    }
+    val scanner = remember { GmsBarcodeScanning.getClient(context, scannerOptions) }
+
+    LaunchedEffect(uiState.scannedSku) {
+        uiState.scannedSku?.let { sku ->
+            onNavigateToProductDetail(sku)
+            viewModel.onNavigatedToDetail()
+        }
+    }
+
+    LaunchedEffect(uiState.scanError) {
+        uiState.scanError?.let { error ->
+            Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+            viewModel.clearError()
+        }
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -108,7 +146,15 @@ fun HomeScreen(
                 }
                 
                 FloatingActionButton(
-                    onClick = { /* TODO: scanner */ },
+                    onClick = { 
+                        scanner.startScan()
+                            .addOnSuccessListener { barcode ->
+                                viewModel.onBarcodeScanned(barcode.rawValue)
+                            }
+                            .addOnFailureListener { e ->
+                                viewModel.onScanError(e.message)
+                            }
+                    },
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                     shape = CircleShape
@@ -173,18 +219,31 @@ fun HomeScreen(
             }
         }
     ) { innerPadding ->
-        Crossfade(
-            targetState = selectedTab,
-            label = "Home Navigation Crossfade",
-            modifier = Modifier.fillMaxSize().padding(innerPadding)
-        ) { tab ->
-            when (tab) {
-                0 -> DashboardScreen()
-                1 -> SearchScreen(
-                    initialQuery = globalSearchQuery,
-                    onProductClick = onNavigateToProductDetail
-                )
-                2 -> ProfileScreen(onLogout = onLogout)
+        Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+            Crossfade(
+                targetState = selectedTab,
+                label = "Home Navigation Crossfade",
+                modifier = Modifier.fillMaxSize()
+            ) { tab ->
+                when (tab) {
+                    0 -> DashboardScreen()
+                    1 -> SearchScreen(
+                        initialQuery = globalSearchQuery,
+                        onProductClick = onNavigateToProductDetail
+                    )
+                    2 -> ProfileScreen(onLogout = onLogout)
+                }
+            }
+            
+            if (uiState.isVerifyingScan) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
             }
         }
     }

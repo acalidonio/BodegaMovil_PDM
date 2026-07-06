@@ -15,6 +15,9 @@ interface ProductDao {
     @Query("SELECT * FROM products WHERE sku = :sku")
     fun getProductBySku(sku: String): Flow<ProductEntity?>
 
+    @Query("SELECT * FROM products WHERE sku = :sku")
+    suspend fun getProductBySkuSync(sku: String): ProductEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProducts(products: List<ProductEntity>)
     

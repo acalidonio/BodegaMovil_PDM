@@ -45,6 +45,26 @@ class InventoryRepositoryImpl(
         return productDao.getProductBySku(sku).map { it?.toDomain() }
     }
 
+    override suspend fun validateAndFetchProduct(sku: String): Product? {
+        val localProduct = productDao.getProductBySkuSync(sku)
+        if (localProduct != null) {
+            return localProduct.toDomain()
+        }
+
+        return try {
+            val remoteProduct = InventoryRemoteDataSource.getProduct(sku)
+            if (remoteProduct != null) {
+                val entity = remoteProduct.toEntity()
+                productDao.insertProduct(entity)
+                entity.toDomain()
+            } else {
+                null
+            }
+        } catch (_: Exception) {
+            null
+        }
+    }
+
     private fun refreshProductsFromServer(query: String? = null) {
         repositoryScope.launch {
             try {
