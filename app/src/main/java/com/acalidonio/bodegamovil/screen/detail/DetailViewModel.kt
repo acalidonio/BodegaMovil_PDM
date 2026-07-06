@@ -12,9 +12,14 @@ import kotlinx.coroutines.launch
 import com.acalidonio.bodegamovil.di.AppContainer
 
 import com.acalidonio.bodegamovil.repository.TokenRepository
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 data class DetailUiState(
     val product: Product? = null,
+    val formattedAuditDate: String = "",
     val isLoading: Boolean = true,
     val isUploading: Boolean = false,
     val error: String? = null,
@@ -47,6 +52,7 @@ class DetailViewModel(
                 _uiState.update { 
                     it.copy(
                         product = product,
+                        formattedAuditDate = formatAuditDate(product?.lastAudit),
                         isLoading = false
                     ) 
                 }
@@ -54,7 +60,17 @@ class DetailViewModel(
         }
     }
 
-
+    private fun formatAuditDate(isoDate: String?): String {
+        if (isoDate == null) return "N/A"
+        return try {
+            val instant = Instant.parse(isoDate)
+            val localDate = instant.atZone(ZoneId.systemDefault()).toLocalDate()
+            val formatter = DateTimeFormatter.ofPattern("dd 'de' MMMM 'de' yyyy", Locale.forLanguageTag("es-ES"))
+            localDate.format(formatter)
+        } catch (_: Exception) {
+            isoDate
+        }
+    }
 
     fun deleteProduct(sku: String) {
         viewModelScope.launch {

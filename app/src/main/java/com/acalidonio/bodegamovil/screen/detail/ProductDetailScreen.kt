@@ -201,7 +201,7 @@ fun ProductDetailScreen(
                                 Text("Última Auditoría", fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                             }
                             Spacer(modifier = Modifier.height(8.dp))
-                            Text(product.lastAudit, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+                            Text(uiState.formattedAuditDate, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
                         }
                     }
                 }
