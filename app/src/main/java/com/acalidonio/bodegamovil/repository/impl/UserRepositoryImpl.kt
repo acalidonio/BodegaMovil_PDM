@@ -19,10 +19,9 @@ class UserRepositoryImpl(
         return try {
             val response = AuthRemoteDataSource.login(LoginRequestDto(employeeId, password))
             tokenRepository.saveToken(response.token)
-            tokenRepository.saveUserDetails(employeeId, response.employeeName, response.role)
+            tokenRepository.saveUserDetails(employeeId, response.employeeName, response.initials, response.role)
             true
-        } catch (e: Exception) {
-            e.printStackTrace()
+        } catch (_: Exception) {
             false
         }
     }
@@ -48,8 +47,7 @@ class UserRepositoryImpl(
                     isActive = dto.date == today
                 )
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
+        } catch (_: Exception) {
             emptyList()
         }
     }

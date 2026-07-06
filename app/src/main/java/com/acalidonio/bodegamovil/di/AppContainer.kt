@@ -2,6 +2,7 @@ package com.acalidonio.bodegamovil.di
 
 import android.content.Context
 import com.acalidonio.bodegamovil.data.local.BodegaDatabase
+import com.acalidonio.bodegamovil.data.remote.ApiClient
 import com.acalidonio.bodegamovil.repository.InventoryRepository
 import com.acalidonio.bodegamovil.repository.TokenRepository
 import com.acalidonio.bodegamovil.repository.UserRepository
@@ -28,5 +29,9 @@ object AppContainer {
         tokenRepository = TokenRepositoryImpl(context)
         database = BodegaDatabase.getDatabase(context)
         inventoryRepository = InventoryRepositoryImpl(database.productDao())
+        
+        ApiClient.onSessionExpired = {
+            tokenRepository.clearToken()
+        }
     }
 }
