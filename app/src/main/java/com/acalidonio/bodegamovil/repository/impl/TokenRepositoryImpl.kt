@@ -19,6 +19,7 @@ class TokenRepositoryImpl(private val context: Context) : TokenRepository {
         private val JWT_TOKEN_KEY = stringPreferencesKey("jwt_token")
         private val USER_ID_KEY = stringPreferencesKey("user_id")
         private val USER_NAME_KEY = stringPreferencesKey("user_name")
+        private val USER_INITIALS_KEY = stringPreferencesKey("user_initials")
         private val USER_ROLE_KEY = stringPreferencesKey("user_role")
     }
 
@@ -28,10 +29,11 @@ class TokenRepositoryImpl(private val context: Context) : TokenRepository {
         }
     }
 
-    override suspend fun saveUserDetails(id: String, name: String, role: String) {
+    override suspend fun saveUserDetails(id: String, name: String, initials: String, role: String) {
         context.dataStore.edit { preferences ->
             preferences[USER_ID_KEY] = id
             preferences[USER_NAME_KEY] = name
+            preferences[USER_INITIALS_KEY] = initials
             preferences[USER_ROLE_KEY] = role
         }
     }
@@ -41,6 +43,7 @@ class TokenRepositoryImpl(private val context: Context) : TokenRepository {
             preferences.remove(JWT_TOKEN_KEY)
             preferences.remove(USER_ID_KEY)
             preferences.remove(USER_NAME_KEY)
+            preferences.remove(USER_INITIALS_KEY)
             preferences.remove(USER_ROLE_KEY)
         }
     }
@@ -55,12 +58,13 @@ class TokenRepositoryImpl(private val context: Context) : TokenRepository {
         return context.dataStore.data.map { preferences ->
             val id = preferences[USER_ID_KEY]
             val name = preferences[USER_NAME_KEY]
+            val initials = preferences[USER_INITIALS_KEY]
             val role = preferences[USER_ROLE_KEY]
-            if (id != null && name != null && role != null) {
+            if (id != null && name != null && initials != null && role != null) {
                 User(
                     employeeId = id,
                     name = name,
-                    initials = name.take(2).uppercase(),
+                    initials = initials,
                     role = role
                 )
             } else {
