@@ -57,6 +57,7 @@ import com.acalidonio.bodegamovil.di.AppContainer
 import com.acalidonio.bodegamovil.screen.dashboard.DashboardScreen
 import com.acalidonio.bodegamovil.screen.profile.ProfileScreen
 import com.acalidonio.bodegamovil.screen.search.SearchScreen
+import androidx.activity.compose.BackHandler
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,6 +83,11 @@ fun HomeScreen(
             .build()
     }
     val scanner = remember { GmsBarcodeScanning.getClient(context, scannerOptions) }
+
+    BackHandler(enabled = selectedTab != 0) {
+        selectedTab = 0
+        globalSearchQuery = ""
+    }
 
     LaunchedEffect(uiState.scannedSku) {
         uiState.scannedSku?.let { sku ->
