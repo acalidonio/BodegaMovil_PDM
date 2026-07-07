@@ -17,7 +17,8 @@ data class ProductEntity(
     val outerDiameter: String? = null,
     val width: String? = null,
     val weight: String? = null,
-    val material: String? = null
+    val material: String? = null,
+    val imageUrl: String? = null
 )
 
 fun ProductEntity.toDomain(): Product {
@@ -32,7 +33,8 @@ fun ProductEntity.toDomain(): Product {
         outerDiameter = outerDiameter,
         width = width,
         weight = weight,
-        material = material
+        material = material,
+        imageUrl = imageUrl
     )
 }
 

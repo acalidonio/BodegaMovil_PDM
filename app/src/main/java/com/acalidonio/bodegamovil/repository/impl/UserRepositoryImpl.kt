@@ -19,7 +19,7 @@ class UserRepositoryImpl(
         return try {
             val response = AuthRemoteDataSource.login(LoginRequestDto(employeeId, password))
             tokenRepository.saveToken(response.token)
-            tokenRepository.saveUserDetails(employeeId, response.employeeName, response.initials, response.role)
+            tokenRepository.saveUserDetails(employeeId, response.employeeName, response.initials, response.role, response.profileImageUrl)
             true
         } catch (_: Exception) {
             false

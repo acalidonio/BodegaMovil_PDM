@@ -17,7 +17,8 @@ data class ProductDto(
     val outerDiameter: String? = null,
     val width: String? = null,
     val weight: String? = null,
-    val material: String? = null
+    val material: String? = null,
+    val imageUrl: String? = null
 )
 
 fun ProductDto.toEntity(): ProductEntity {
@@ -32,7 +33,8 @@ fun ProductDto.toEntity(): ProductEntity {
         outerDiameter = outerDiameter,
         width = width,
         weight = weight,
-        material = material
+        material = material,
+        imageUrl = imageUrl
     )
 }
 
@@ -48,6 +50,7 @@ fun Product.toDto(): ProductDto {
         outerDiameter = outerDiameter,
         width = width,
         weight = weight,
-        material = material
+        material = material,
+        imageUrl = imageUrl
     )
 }
