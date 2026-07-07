@@ -70,18 +70,25 @@ class InventoryRepositoryImpl(
         }
     }
 
-    override suspend fun syncProducts(query: String, categories: Set<ProductCategory>) {
-        try {
-            val remoteProducts = InventoryRemoteDataSource.fetchProducts(query, categories.map { it.name }.toSet())
+    override suspend fun syncProducts(query: String, categories: Set<ProductCategory>, page: Int): Int {
+        return try {
+            val remoteProducts = InventoryRemoteDataSource.fetchProducts(query, categories.map { it.name }.toSet(), page)
             val entities = remoteProducts.map { it.toEntity() }
             
-            if (query.isBlank()) {
-                productDao.replaceAll(entities)
+            if (page == 0) {
+                if (query.isBlank() && categories.isEmpty()) {
+                    productDao.replaceAll(entities)
+                } else {
+                    productDao.deleteAll()
+                    productDao.insertProducts(entities)
+                }
             } else {
                 productDao.insertProducts(entities)
             }
+            remoteProducts.size
         } catch (e: Exception) {
             e.printStackTrace()
+            0
         }
     }
 

@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 interface InventoryRepository {
     fun getProducts(): Flow<List<Product>>
     fun searchProducts(query: String, categories: Set<ProductCategory> = emptySet()): Flow<List<Product>>
-    suspend fun syncProducts(query: String, categories: Set<ProductCategory> = emptySet())
+    suspend fun syncProducts(query: String, categories: Set<ProductCategory> = emptySet(), page: Int = 0): Int
     fun getProductBySku(sku: String): Flow<Product?>
     suspend fun validateAndFetchProduct(sku: String): Product?
     suspend fun createProduct(product: Product)

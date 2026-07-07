@@ -19,7 +19,7 @@ object InventoryRemoteDataSource {
 
     private const val BASE_URL_INVENTORY : String = "/api/inventory"
     private const val BASE_URL_DASHBOARD : String = "/api/dashboard"
-    suspend fun fetchProducts(query: String? = null, categories: Set<String>? = null): List<ProductDto> {
+    suspend fun fetchProducts(query: String? = null, categories: Set<String>? = null, page: Int = 0): List<ProductDto> {
         val response: GeneralResponse<PageableResponse<ProductDto>> = ApiClient.client.get(BASE_URL_INVENTORY) {
             if (!query.isNullOrBlank()) {
                 parameter("query", query)
@@ -27,6 +27,7 @@ object InventoryRemoteDataSource {
             if (!categories.isNullOrEmpty()) {
                 parameter("categories", categories.joinToString(","))
             }
+            parameter("page", page)
         }.body()
         
         return response.data?.content ?: emptyList()
