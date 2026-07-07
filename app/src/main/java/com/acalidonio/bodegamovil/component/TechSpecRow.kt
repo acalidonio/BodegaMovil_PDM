@@ -1,6 +1,5 @@
 package com.acalidonio.bodegamovil.component
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,11 +17,20 @@ import androidx.compose.ui.unit.sp
 fun TechSpecRow(label: String, value: String, showDivider: Boolean = true) {
     Column {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp)
         ) {
-            Text(label, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), fontSize = 14.sp)
-            Text(value, fontWeight = FontWeight.Medium, fontSize = 14.sp)
+            Text(
+                text = label,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                fontSize = 14.sp,
+                modifier = Modifier.weight(0.4f).padding(end = 8.dp)
+            )
+            Text(
+                text = value,
+                fontWeight = FontWeight.Medium,
+                fontSize = 14.sp,
+                modifier = Modifier.weight(0.6f)
+            )
         }
         if (showDivider) {
             HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))

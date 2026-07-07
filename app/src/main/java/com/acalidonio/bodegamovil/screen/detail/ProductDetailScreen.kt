@@ -162,6 +162,7 @@ fun ProductDetailScreen(
                 Text(
                     text = product.name,
                     fontSize = 28.sp,
+                    lineHeight = 34.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -189,6 +190,7 @@ fun ProductDetailScreen(
                         Text(
                             text = product.location,
                             fontSize = 32.sp,
+                            lineHeight = 38.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
