@@ -21,6 +21,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080/\"")
     }
 
     buildTypes {
@@ -30,6 +31,18 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "BASE_URL", "\"https://bodegamovilbackend-production.up.railway.app/\"")
+        }
+        debug {
+            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080/\"")
+        }
+        create("debugProduction") {
+            initWith(getByName("debug"))
+            buildConfigField("String", "BASE_URL", "\"https://bodegamovilbackend-production.up.railway.app/\"")
+        }
+        create("debugLocalPhone") {
+            initWith(getByName("debug"))
+            buildConfigField("String", "BASE_URL", "\"http://192.168.0.2:8080/\"")
         }
     }
     compileOptions {
@@ -38,6 +51,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
