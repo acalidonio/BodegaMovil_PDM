@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import com.acalidonio.bodegamovil.model.DashboardStats
 
 class InventoryRepositoryImpl(
     private val productDao: ProductDao
@@ -114,5 +115,28 @@ class InventoryRepositoryImpl(
     override suspend fun deleteProduct(sku: String) {
         InventoryRemoteDataSource.deleteProduct(sku)
         productDao.deleteProductBySku(sku)
+    }
+
+    private var cachedStats: DashboardStats? = null
+    private var cachedRecentProducts: List<Product>? = null
+
+    override suspend fun getDashboardStats(): DashboardStats {
+        return try {
+            val stats = InventoryRemoteDataSource.fetchDashboardStats().toDomain()
+            cachedStats = stats
+            stats
+        } catch (_: Exception) {
+            cachedStats ?: DashboardStats(0, 0, 0)
+        }
+    }
+
+    override suspend fun getRecentProducts(): List<Product> {
+        return try {
+            val recent = InventoryRemoteDataSource.fetchRecentProducts().map { it.toEntity().toDomain() }
+            cachedRecentProducts = recent
+            recent
+        } catch (_: Exception) {
+            cachedRecentProducts ?: emptyList()
+        }
     }
 }

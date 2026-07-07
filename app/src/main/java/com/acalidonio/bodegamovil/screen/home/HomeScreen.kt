@@ -229,7 +229,7 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxSize()
             ) { tab ->
                 when (tab) {
-                    0 -> DashboardScreen()
+                    0 -> DashboardScreen(onProductClick = onNavigateToProductDetail)
                     1 -> SearchScreen(
                         initialQuery = globalSearchQuery,
                         onProductClick = onNavigateToProductDetail

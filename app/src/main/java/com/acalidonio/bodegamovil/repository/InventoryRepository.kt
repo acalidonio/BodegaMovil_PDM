@@ -1,5 +1,6 @@
 package com.acalidonio.bodegamovil.repository
 
+import com.acalidonio.bodegamovil.model.DashboardStats
 import com.acalidonio.bodegamovil.model.Product
 
 import com.acalidonio.bodegamovil.model.ProductCategory
@@ -14,4 +15,6 @@ interface InventoryRepository {
     suspend fun createProduct(product: Product)
     suspend fun updateProduct(sku: String, product: Product)
     suspend fun deleteProduct(sku: String)
+    suspend fun getDashboardStats(): DashboardStats
+    suspend fun getRecentProducts(): List<Product>
 }
