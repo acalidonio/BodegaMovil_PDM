@@ -21,7 +21,8 @@ data class DashboardUiState(
     val currentShift: String = "No hay turno hoy",
     val stats: DashboardStats = DashboardStats(0, 0, 0),
     val recentProducts: List<Product> = emptyList(),
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false
 )
 
 class DashboardViewModel(
@@ -43,9 +44,13 @@ class DashboardViewModel(
         refresh()
     }
 
-    fun refresh() {
+    fun refresh(isPullToRefresh: Boolean = false) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            if (isPullToRefresh) {
+                _uiState.update { it.copy(isRefreshing = true) }
+            } else {
+                _uiState.update { it.copy(isLoading = true) }
+            }
             try {
                 val shifts = ShiftRemoteDataSource.getMyWeeklyShifts()
                 val today = LocalDate.now().toString()
@@ -66,7 +71,7 @@ class DashboardViewModel(
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
-                _uiState.update { it.copy(isLoading = false) }
+                _uiState.update { it.copy(isLoading = false, isRefreshing = false) }
             }
         }
     }
