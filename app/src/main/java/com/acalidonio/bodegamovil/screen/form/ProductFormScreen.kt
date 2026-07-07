@@ -98,14 +98,6 @@ fun ProductFormScreen(
                     .verticalScroll(rememberScrollState())
                     .padding(16.dp)
             ) {
-                if (uiState.error != null) {
-                    Text(
-                        text = uiState.error!!,
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
-                }
-
                 Text("Campos marcados con '*' son obligatorios.", modifier = Modifier.padding(bottom = 8.dp), color = Color.Red)
 
                 OutlinedTextField(
@@ -212,6 +204,14 @@ fun ProductFormScreen(
                     label = { Text("Peso") },
                     modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp)
                 )
+
+                if (uiState.error != null) {
+                    Text(
+                        text = uiState.error!!,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
 
                 Button(
                     onClick = { viewModel.saveProduct() },
