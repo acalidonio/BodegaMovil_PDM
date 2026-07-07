@@ -95,11 +95,16 @@ fun ProductItemCard(product: Product, onClick: () -> Unit) {
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                             modifier = Modifier.padding(top = 4.dp)
                         )
+                        Text(
+                            text = product.category?.displayName ?: "",
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                        )
                     }
                     StockStatusBadge(status = product.status)
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
