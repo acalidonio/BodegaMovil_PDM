@@ -90,7 +90,10 @@ fun SearchScreen(
             ),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(uiState.results) { product ->
+            items(
+                items = uiState.results,
+                key = { product -> product.sku }
+            ) { product ->
                 ProductItemCard(
                     product = product,
                     onClick = { onProductClick(product.sku) }

@@ -75,9 +75,10 @@ class InventoryRepositoryImpl(
             val entities = remoteProducts.map { it.toEntity() }
             
             if (query.isBlank()) {
-                productDao.deleteAll()
+                productDao.replaceAll(entities)
+            } else {
+                productDao.insertProducts(entities)
             }
-            productDao.insertProducts(entities)
         } catch (e: Exception) {
             e.printStackTrace()
         }

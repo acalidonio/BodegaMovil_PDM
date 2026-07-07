@@ -4,6 +4,7 @@ import androidx.room3.Dao
 import androidx.room3.Insert
 import androidx.room3.OnConflictStrategy
 import androidx.room3.Query
+import androidx.room3.Transaction
 import com.acalidonio.bodegamovil.data.local.entity.ProductEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -29,4 +30,10 @@ interface ProductDao {
 
     @Query("DELETE FROM products")
     suspend fun deleteAll()
+
+    @Transaction
+    suspend fun replaceAll(products: List<ProductEntity>) {
+        deleteAll()
+        insertProducts(products)
+    }
 }
