@@ -3,6 +3,7 @@ package com.acalidonio.bodegamovil.screen.form
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.acalidonio.bodegamovil.model.Product
+import com.acalidonio.bodegamovil.model.ProductCategory
 import com.acalidonio.bodegamovil.model.StockStatus
 import com.acalidonio.bodegamovil.repository.InventoryRepository
 import com.acalidonio.bodegamovil.di.AppContainer
@@ -24,6 +25,7 @@ data class ProductFormUiState(
     val weight: String = "",
     val material: String = "",
     val imageUrl: String = "",
+    val category: ProductCategory? = null,
 
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,
@@ -63,6 +65,7 @@ class ProductFormViewModel(
                             weight = product.weight ?: "",
                             material = product.material ?: "",
                             imageUrl = product.imageUrl ?: "",
+                            category = product.category,
                             isLoading = false
                         )
                     }
@@ -89,10 +92,14 @@ class ProductFormViewModel(
         }
     }
 
+    fun updateCategory(category: ProductCategory?) {
+        _uiState.update { it.copy(category = category) }
+    }
+
     fun saveProduct() {
         val state = _uiState.value
-        if (state.name.isBlank() || state.sku.isBlank() || state.stock.isBlank()) {
-            _uiState.update { it.copy(error = "Nombre, SKU y Stock son obligatorios") }
+        if (state.name.isBlank() || state.sku.isBlank() || state.stock.isBlank() || state.category == null) {
+            _uiState.update { it.copy(error = "Nombre, SKU, Stock y Categoría son obligatorios") }
             return
         }
 
@@ -120,7 +127,8 @@ class ProductFormViewModel(
             width = state.width.ifBlank { null },
             weight = state.weight.ifBlank { null },
             material = state.material.ifBlank { null },
-            imageUrl = state.imageUrl.ifBlank { null }
+            imageUrl = state.imageUrl.ifBlank { null },
+            category = state.category
         )
 
         viewModelScope.launch {

@@ -13,7 +13,8 @@ data class Product(
     val width: String? = null,
     val weight: String? = null,
     val material: String? = null,
-    val imageUrl: String? = null
+    val imageUrl: String? = null,
+    val category: ProductCategory? = null
 )
 
 enum class StockStatus {

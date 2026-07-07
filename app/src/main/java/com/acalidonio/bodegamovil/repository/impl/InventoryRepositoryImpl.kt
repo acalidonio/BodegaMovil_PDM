@@ -6,6 +6,7 @@ import com.acalidonio.bodegamovil.data.remote.InventoryRemoteDataSource
 import com.acalidonio.bodegamovil.data.remote.dto.toDto
 import com.acalidonio.bodegamovil.data.remote.dto.toEntity
 import com.acalidonio.bodegamovil.model.Product
+import com.acalidonio.bodegamovil.model.ProductCategory
 import com.acalidonio.bodegamovil.repository.InventoryRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,10 +27,13 @@ class InventoryRepositoryImpl(
         }
     }
 
-    override fun searchProducts(query: String): Flow<List<Product>> {
-        refreshProductsFromServer(query)
+    override fun searchProducts(query: String, categories: Set<ProductCategory>): Flow<List<Product>> {
         return productDao.searchProducts(query).map { entities ->
-            entities.map { it.toDomain() }
+            var domainList = entities.map { it.toDomain() }
+            if (categories.isNotEmpty()) {
+                domainList = domainList.filter { it.category in categories }
+            }
+            domainList
         }
     }
 
@@ -65,10 +69,24 @@ class InventoryRepositoryImpl(
         }
     }
 
-    private fun refreshProductsFromServer(query: String? = null) {
+    override suspend fun syncProducts(query: String, categories: Set<ProductCategory>) {
+        try {
+            val remoteProducts = InventoryRemoteDataSource.fetchProducts(query, categories.map { it.name }.toSet())
+            val entities = remoteProducts.map { it.toEntity() }
+            
+            if (query.isBlank()) {
+                productDao.deleteAll()
+            }
+            productDao.insertProducts(entities)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun refreshProductsFromServer(query: String? = null, categories: Set<String>? = null) {
         repositoryScope.launch {
             try {
-                val remoteProducts = InventoryRemoteDataSource.fetchProducts(query)
+                val remoteProducts = InventoryRemoteDataSource.fetchProducts(query, categories)
                 val entities = remoteProducts.map { it.toEntity() }
                 
                 if (query.isNullOrBlank()) {
@@ -76,7 +94,9 @@ class InventoryRepositoryImpl(
                 }
                 
                 productDao.insertProducts(entities)
-            } catch (_: Exception) {}
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 

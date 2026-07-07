@@ -2,11 +2,13 @@ package com.acalidonio.bodegamovil.repository
 
 import com.acalidonio.bodegamovil.model.Product
 
+import com.acalidonio.bodegamovil.model.ProductCategory
 import kotlinx.coroutines.flow.Flow
 
 interface InventoryRepository {
     fun getProducts(): Flow<List<Product>>
-    fun searchProducts(query: String): Flow<List<Product>>
+    fun searchProducts(query: String, categories: Set<ProductCategory> = emptySet()): Flow<List<Product>>
+    suspend fun syncProducts(query: String, categories: Set<ProductCategory> = emptySet())
     fun getProductBySku(sku: String): Flow<Product?>
     suspend fun validateAndFetchProduct(sku: String): Product?
     suspend fun createProduct(product: Product)

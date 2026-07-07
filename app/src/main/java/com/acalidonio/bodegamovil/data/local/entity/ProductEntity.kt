@@ -3,6 +3,7 @@ package com.acalidonio.bodegamovil.data.local.entity
 import androidx.room3.Entity
 import androidx.room3.PrimaryKey
 import com.acalidonio.bodegamovil.model.Product
+import com.acalidonio.bodegamovil.model.ProductCategory
 import com.acalidonio.bodegamovil.model.StockStatus
 
 @Entity(tableName = "products")
@@ -18,7 +19,8 @@ data class ProductEntity(
     val width: String? = null,
     val weight: String? = null,
     val material: String? = null,
-    val imageUrl: String? = null
+    val imageUrl: String? = null,
+    val category: String? = null
 )
 
 fun ProductEntity.toDomain(): Product {
@@ -34,7 +36,8 @@ fun ProductEntity.toDomain(): Product {
         width = width,
         weight = weight,
         material = material,
-        imageUrl = imageUrl
+        imageUrl = imageUrl,
+        category = try { category?.let { ProductCategory.valueOf(it) } } catch (_: Exception) { null }
     )
 }
 

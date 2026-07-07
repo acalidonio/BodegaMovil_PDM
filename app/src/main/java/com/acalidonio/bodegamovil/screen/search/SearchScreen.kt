@@ -1,14 +1,18 @@
 package com.acalidonio.bodegamovil.screen.search
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -21,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.acalidonio.bodegamovil.component.ProductItemCard
+import com.acalidonio.bodegamovil.model.ProductCategory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,8 +46,32 @@ fun SearchScreen(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        if (uiState.isLoading) {
-            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+        Box(modifier = Modifier.fillMaxWidth().height(4.dp)) {
+            if (uiState.isLoading) {
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            }
+        }
+        
+        LazyRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            item {
+                FilterChip(
+                    selected = uiState.categories.isEmpty(),
+                    onClick = { viewModel.toggleCategory(null) },
+                    label = { Text("Todos") }
+                )
+            }
+            items(ProductCategory.entries.toTypedArray()) { category ->
+                FilterChip(
+                    selected = uiState.categories.contains(category),
+                    onClick = { viewModel.toggleCategory(category) },
+                    label = { Text(category.displayName) }
+                )
+            }
         }
 
         Text(

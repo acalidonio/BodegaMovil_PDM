@@ -17,10 +17,13 @@ import io.ktor.http.contentType
 object InventoryRemoteDataSource {
 
     private const val BASE_URL : String = "/api/inventory"
-    suspend fun fetchProducts(query: String? = null): List<ProductDto> {
+    suspend fun fetchProducts(query: String? = null, categories: Set<String>? = null): List<ProductDto> {
         val response: GeneralResponse<PageableResponse<ProductDto>> = ApiClient.client.get(BASE_URL) {
             if (!query.isNullOrBlank()) {
                 parameter("query", query)
+            }
+            if (!categories.isNullOrEmpty()) {
+                parameter("categories", categories.joinToString(","))
             }
         }.body()
         
