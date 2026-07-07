@@ -23,6 +23,7 @@ data class ProductFormUiState(
     val width: String = "",
     val weight: String = "",
     val material: String = "",
+    val imageUrl: String = "",
 
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,
@@ -61,6 +62,7 @@ class ProductFormViewModel(
                             width = product.width ?: "",
                             weight = product.weight ?: "",
                             material = product.material ?: "",
+                            imageUrl = product.imageUrl ?: "",
                             isLoading = false
                         )
                     }
@@ -81,6 +83,7 @@ class ProductFormViewModel(
                 "width" -> state.copy(width = value)
                 "weight" -> state.copy(weight = value)
                 "material" -> state.copy(material = value)
+                "imageUrl" -> state.copy(imageUrl = value)
                 else -> state
             }
         }
@@ -116,7 +119,8 @@ class ProductFormViewModel(
             outerDiameter = state.outerDiameter.ifBlank { null },
             width = state.width.ifBlank { null },
             weight = state.weight.ifBlank { null },
-            material = state.material.ifBlank { null }
+            material = state.material.ifBlank { null },
+            imageUrl = state.imageUrl.ifBlank { null }
         )
 
         viewModelScope.launch {

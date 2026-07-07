@@ -127,6 +127,13 @@ fun ProductFormScreen(
                     value = uiState.location,
                     onValueChange = { viewModel.updateField("location", it) },
                     label = { Text("Ubicación Física") },
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                )
+
+                OutlinedTextField(
+                    value = uiState.imageUrl,
+                    onValueChange = { viewModel.updateField("imageUrl", it) },
+                    label = { Text("Enlace de Imagen (Opcional)") },
                     modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp)
                 )
 
