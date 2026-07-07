@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ProductDao {
-    @Query("SELECT * FROM products WHERE sku LIKE '%' || :query || '%' OR name LIKE '%' || :query || '%'")
+    @Query("SELECT * FROM products WHERE sku LIKE '%' || :query || '%' OR name LIKE '%' || :query || '%' ORDER BY name ASC")
     fun searchProducts(query: String): Flow<List<ProductEntity>>
 
     @Query("SELECT * FROM products WHERE sku = :sku")
