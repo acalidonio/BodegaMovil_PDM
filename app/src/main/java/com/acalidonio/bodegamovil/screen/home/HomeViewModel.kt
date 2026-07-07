@@ -39,10 +39,6 @@ class HomeViewModel(
         }
     }
 
-    fun onScanError(errorMessage: String?) {
-        _uiState.update { it.copy(scanError = errorMessage ?: "Error desconocido al escanear") }
-    }
-
     fun onNavigatedToDetail() {
         _uiState.update { it.copy(scannedSku = null) }
     }

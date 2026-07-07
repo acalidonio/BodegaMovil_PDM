@@ -151,9 +151,6 @@ fun HomeScreen(
                             .addOnSuccessListener { barcode ->
                                 viewModel.onBarcodeScanned(barcode.rawValue)
                             }
-                            .addOnFailureListener { e ->
-                                viewModel.onScanError(e.message)
-                            }
                     },
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
