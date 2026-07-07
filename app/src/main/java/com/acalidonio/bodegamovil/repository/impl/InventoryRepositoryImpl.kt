@@ -76,12 +76,7 @@ class InventoryRepositoryImpl(
             val entities = remoteProducts.map { it.toEntity() }
             
             if (page == 0) {
-                if (query.isBlank() && categories.isEmpty()) {
-                    productDao.replaceAll(entities)
-                } else {
-                    productDao.deleteAll()
-                    productDao.insertProducts(entities)
-                }
+                productDao.replaceAll(entities)
             } else {
                 productDao.insertProducts(entities)
             }

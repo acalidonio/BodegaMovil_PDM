@@ -119,16 +119,5 @@ class SearchViewModel(
         val newCategories = currentCategories.toSet()
         _uiState.update { state -> state.copy(categories = newCategories) }
         _selectedCategories.value = newCategories
-
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            currentPage = 0
-            _uiState.update { it.copy(isLastPage = false) }
-            val count = repository.syncProducts(_uiState.value.query, _uiState.value.categories, currentPage)
-            if (count < 20) {
-                _uiState.update { it.copy(isLastPage = true) }
-            }
-            _uiState.update { it.copy(isLoading = false) }
-        }
     }
 }
