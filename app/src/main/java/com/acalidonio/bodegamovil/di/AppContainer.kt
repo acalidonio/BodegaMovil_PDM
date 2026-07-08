@@ -32,6 +32,7 @@ object AppContainer {
         
         ApiClient.onSessionExpired = {
             tokenRepository.clearToken()
+            ApiClient.authToken = null
         }
     }
 }

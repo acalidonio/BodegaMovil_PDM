@@ -8,8 +8,12 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.acalidonio.bodegamovil.model.User
 import com.acalidonio.bodegamovil.repository.TokenRepository
+import com.acalidonio.bodegamovil.utils.JwtUtils
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "auth_prefs")
 
@@ -59,7 +63,17 @@ class TokenRepositoryImpl(private val context: Context) : TokenRepository {
 
     override fun getToken(): Flow<String?> {
         return context.dataStore.data.map { preferences ->
-            preferences[JWT_TOKEN_KEY]
+            val token = preferences[JWT_TOKEN_KEY]
+            if (JwtUtils.isTokenValid(token)) {
+                token
+            } else {
+                if (token != null) {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        clearToken()
+                    }
+                }
+                null
+            }
         }
     }
 
