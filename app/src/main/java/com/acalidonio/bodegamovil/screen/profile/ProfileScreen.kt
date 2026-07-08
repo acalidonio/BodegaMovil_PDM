@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
+import androidx.compose.ui.text.style.TextOverflow
 import com.acalidonio.bodegamovil.component.ShiftItemRow
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -173,12 +174,11 @@ fun ProfileScreen(
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
                                 Icon(Icons.Outlined.Schedule, contentDescription = "Reloj", tint = MaterialTheme.colorScheme.onSurface)
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
@@ -188,13 +188,29 @@ fun ProfileScreen(
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                             }
-                            
-                            Row(verticalAlignment = Alignment.CenterVertically) {
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
                                 IconButton(onClick = { viewModel.previousWeek() }, modifier = Modifier.size(32.dp)) {
                                     Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Semana Anterior")
                                 }
-                                TextButton(onClick = { showDatePicker = true }, modifier = Modifier.padding(horizontal = 4.dp), border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary)) {
-                                    Text(uiState.weekLabelText, fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
+                                TextButton(
+                                    onClick = { showDatePicker = true },
+                                    modifier = Modifier.padding(horizontal = 4.dp),
+                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary)
+                                ) {
+                                    Text(
+                                        text = uiState.weekLabelText,
+                                        fontWeight = FontWeight.SemiBold,
+                                        fontSize = 12.sp,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
                                 }
                                 IconButton(onClick = { viewModel.nextWeek() }, modifier = Modifier.size(32.dp)) {
                                     Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "Semana Siguiente")
