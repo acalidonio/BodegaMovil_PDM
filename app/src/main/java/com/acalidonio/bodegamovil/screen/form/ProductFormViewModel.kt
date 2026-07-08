@@ -2,6 +2,7 @@ package com.acalidonio.bodegamovil.screen.form
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.acalidonio.bodegamovil.data.remote.ServerApiException
 import com.acalidonio.bodegamovil.model.Product
 import com.acalidonio.bodegamovil.model.ProductCategory
 import com.acalidonio.bodegamovil.model.StockStatus
@@ -140,6 +141,8 @@ class ProductFormViewModel(
                     repository.createProduct(product)
                 }
                 _uiState.update { it.copy(isSaving = false, isSuccess = true) }
+            } catch (e: ServerApiException) {
+                _uiState.update { it.copy(isSaving = false, error = e.serverMessage) }
             } catch (_: Exception) {
                 _uiState.update { it.copy(isSaving = false, error = "No se pudo conectar al servidor. Verifica tu conexión a internet.") }
             }

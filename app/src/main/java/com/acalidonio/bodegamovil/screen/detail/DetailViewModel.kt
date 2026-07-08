@@ -2,6 +2,7 @@ package com.acalidonio.bodegamovil.screen.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.acalidonio.bodegamovil.data.remote.ServerApiException
 import com.acalidonio.bodegamovil.model.Product
 import com.acalidonio.bodegamovil.repository.InventoryRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -78,6 +79,8 @@ class DetailViewModel(
             try {
                 repository.deleteProduct(sku)
                 _uiState.update { it.copy(isUploading = false, isActionSuccess = true) }
+            } catch (e: ServerApiException) {
+                _uiState.update { it.copy(isUploading = false, error = e.serverMessage) }
             } catch (_: Exception) {
                 _uiState.update { it.copy(isUploading = false, error = "No se pudo conectar al servidor. Verifica tu conexión a internet.") }
             }

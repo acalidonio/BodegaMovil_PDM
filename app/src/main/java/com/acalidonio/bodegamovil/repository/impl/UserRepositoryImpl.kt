@@ -1,6 +1,7 @@
 package com.acalidonio.bodegamovil.repository.impl
 
 import com.acalidonio.bodegamovil.data.remote.AuthRemoteDataSource
+import com.acalidonio.bodegamovil.data.remote.ServerApiException
 import com.acalidonio.bodegamovil.data.remote.dto.LoginRequestDto
 import com.acalidonio.bodegamovil.model.User
 import com.acalidonio.bodegamovil.model.WorkShift
@@ -21,6 +22,8 @@ class UserRepositoryImpl(
             tokenRepository.saveToken(response.token)
             tokenRepository.saveUserDetails(employeeId, response.employeeName, response.initials, response.role, response.profileImageUrl)
             true
+        } catch (e: ServerApiException) {
+            throw e
         } catch (_: Exception) {
             false
         }

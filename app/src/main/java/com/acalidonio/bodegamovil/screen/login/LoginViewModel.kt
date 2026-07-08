@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import com.acalidonio.bodegamovil.data.remote.ApiClient
+import com.acalidonio.bodegamovil.data.remote.ServerApiException
 import com.acalidonio.bodegamovil.repository.TokenRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -42,11 +43,17 @@ class LoginViewModel(
     fun login(employeeId: String, pass: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
-            val success = userRepository.login(employeeId, pass)
-            if (success) {
-                _uiState.update { it.copy(isLoading = false, isSuccess = true) }
-            } else {
-                _uiState.update { it.copy(isLoading = false, error = "Credenciales incorrectas o error de red") }
+            try {
+                val success = userRepository.login(employeeId, pass)
+                if (success) {
+                    _uiState.update { it.copy(isLoading = false, isSuccess = true) }
+                } else {
+                    _uiState.update { it.copy(isLoading = false, error = "Credenciales incorrectas") }
+                }
+            } catch (e: ServerApiException) {
+                _uiState.update { it.copy(isLoading = false, error = e.serverMessage) }
+            } catch (_: Exception) {
+                _uiState.update { it.copy(isLoading = false, error = "Error de red") }
             }
         }
     }
