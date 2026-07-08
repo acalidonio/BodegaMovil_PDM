@@ -52,13 +52,11 @@ fun ProductFormScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        viewModel.reset()
-    }
-
     LaunchedEffect(skuToEdit) {
         if (skuToEdit != null) {
             viewModel.loadProductForEdit(skuToEdit)
+        } else {
+            viewModel.reset()
         }
     }
 
@@ -114,6 +112,14 @@ fun ProductFormScreen(
                     value = uiState.name,
                     onValueChange = { viewModel.updateField("name", it) },
                     label = { Text("Nombre del Producto *") },
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                )
+
+                OutlinedTextField(
+                    value = uiState.description,
+                    onValueChange = { viewModel.updateField("description", it) },
+                    label = { Text("Descripción") },
+                    minLines = 2,
                     modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
                 )
 

@@ -92,6 +92,16 @@ fun ProductItemCard(product: Product, onClick: () -> Unit) {
                             maxLines = 3,
                             overflow = TextOverflow.Ellipsis
                         )
+                        if (!product.description.isNullOrBlank()) {
+                            Text(
+                                text = product.description,
+                                fontSize = 14.sp,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                                modifier = Modifier.padding(top = 2.dp),
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                         Text(
                             text = product.sku,
                             fontSize = 14.sp,

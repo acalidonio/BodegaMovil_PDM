@@ -7,7 +7,7 @@ import androidx.room3.RoomDatabase
 import com.acalidonio.bodegamovil.data.local.dao.ProductDao
 import com.acalidonio.bodegamovil.data.local.entity.ProductEntity
 
-@Database(entities = [ProductEntity::class], version = 3, exportSchema = false)
+@Database(entities = [ProductEntity::class], version = 4, exportSchema = false)
 abstract class BodegaDatabase : RoomDatabase() {
 
     abstract fun productDao(): ProductDao

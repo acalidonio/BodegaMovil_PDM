@@ -10,6 +10,7 @@ import com.acalidonio.bodegamovil.model.StockStatus
 data class ProductEntity(
     @PrimaryKey val sku: String,
     val name: String,
+    val description: String? = null,
     val location: String,
     val stock: Int,
     val status: String,
@@ -27,6 +28,7 @@ fun ProductEntity.toDomain(): Product {
     return Product(
         sku = sku,
         name = name,
+        description = description,
         location = location,
         stock = stock,
         status = try { StockStatus.valueOf(status) } catch (_: Exception) { StockStatus.AVAILABLE },

@@ -171,8 +171,18 @@ fun ProductDetailScreen(
                     text = product.sku,
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-                    modifier = Modifier.padding(bottom = 24.dp)
+                    modifier = Modifier.padding(bottom = 4.dp)
                 )
+                if (!product.description.isNullOrBlank()) {
+                    Text(
+                        text = product.description,
+                        fontSize = 16.sp,
+                        lineHeight = 24.sp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
 
                 // Ubicación del producto
                 Card(

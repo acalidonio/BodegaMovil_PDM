@@ -26,6 +26,7 @@ fun ProductDto.toEntity(): ProductEntity {
     return ProductEntity(
         sku = sku,
         name = name,
+        description = description,
         location = location,
         stock = stock,
         status = status,
@@ -44,6 +45,7 @@ fun Product.toDto(): ProductDto {
     return ProductDto(
         sku = sku,
         name = name,
+        description = description,
         location = location,
         stock = stock,
         status = status.name,

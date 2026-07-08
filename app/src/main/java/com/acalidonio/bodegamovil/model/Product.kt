@@ -3,6 +3,7 @@ package com.acalidonio.bodegamovil.model
 data class Product(
     val sku: String,
     val name: String,
+    val description: String? = null,
     val location: String,
     val stock: Int,
     val status: StockStatus,

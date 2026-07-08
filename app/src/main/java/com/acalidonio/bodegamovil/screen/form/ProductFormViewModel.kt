@@ -18,6 +18,7 @@ data class ProductFormUiState(
     val isEditMode: Boolean = false,
     val sku: String = "",
     val name: String = "",
+    val description: String = "",
     val location: String = "",
     val stock: String = "",
     val innerDiameter: String = "",
@@ -42,15 +43,18 @@ class ProductFormViewModel(
     val uiState: StateFlow<ProductFormUiState> = _uiState.asStateFlow()
     
     private var originalSku: String? = null
+    private var loadJob: kotlinx.coroutines.Job? = null
 
     fun reset() {
         originalSku = null
+        loadJob?.cancel()
         _uiState.value = ProductFormUiState()
     }
 
     fun loadProductForEdit(sku: String) {
         originalSku = sku
-        viewModelScope.launch {
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, isEditMode = true) }
             repository.getProductBySku(sku).collect { product ->
                 if (product != null) {
@@ -58,6 +62,7 @@ class ProductFormViewModel(
                         it.copy(
                             sku = product.sku,
                             name = product.name,
+                            description = product.description ?: "",
                             location = product.location,
                             stock = product.stock.toString(),
                             innerDiameter = product.innerDiameter ?: "",
@@ -80,6 +85,7 @@ class ProductFormViewModel(
             when (field) {
                 "sku" -> state.copy(sku = value)
                 "name" -> state.copy(name = value)
+                "description" -> state.copy(description = value)
                 "location" -> state.copy(location = value)
                 "stock" -> state.copy(stock = value)
                 "innerDiameter" -> state.copy(innerDiameter = value)
@@ -119,6 +125,7 @@ class ProductFormViewModel(
         val product = Product(
             sku = state.sku,
             name = state.name,
+            description = state.description.ifBlank { null },
             location = state.location.ifBlank { "N/A" },
             stock = stockInt,
             status = status,
